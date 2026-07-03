@@ -1,29 +1,20 @@
 #!/usr/bin/env bash
-# Install all Cursor skills from this repo to ~/.cursor/skills/
+# Install DiagStack Cursor skills to ~/.cursor/skills/
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SKILLS_SRC="${REPO_ROOT}/skills"
+SKILL_SRC="${REPO_ROOT}/skills/diagstack-c-comment-style"
 TARGET_ROOT="${HOME}/.cursor/skills"
+SKILL_DST="${TARGET_ROOT}/diagstack-c-comment-style"
 
-if [[ ! -d "${SKILLS_SRC}" ]]; then
-  echo "Skills source not found: ${SKILLS_SRC}" >&2
+if [[ ! -d "${SKILL_SRC}" ]]; then
+  echo "Skill source not found: ${SKILL_SRC}" >&2
   exit 1
 fi
 
 mkdir -p "${TARGET_ROOT}"
+rm -rf "${SKILL_DST}"
+cp -R "${SKILL_SRC}" "${SKILL_DST}"
 
-installed=()
-for skill_dir in "${SKILLS_SRC}"/*/; do
-  skill_name="$(basename "${skill_dir}")"
-  skill_dst="${TARGET_ROOT}/${skill_name}"
-  rm -rf "${skill_dst}"
-  cp -R "${skill_dir}" "${skill_dst}"
-  installed+=("${skill_name}")
-done
-
-echo "Installed skills to ${TARGET_ROOT}:"
-for name in "${installed[@]}"; do
-  echo "  - ${name}"
-done
-echo "Restart Cursor or start a new chat to use installed skills."
+echo "Installed: ${SKILL_DST}"
+echo "Restart Cursor or start a new chat to use diagstack-c-comment-style."

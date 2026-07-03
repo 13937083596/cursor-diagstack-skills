@@ -13,8 +13,6 @@ cursor-diagstack-skills/
 ├── README.md
 ├── LICENSE
 ├── skills/
-│   ├── c-comment-style/
-│   │   └── SKILL.md       # .h 简写 / .c 完整 函数注释规范
 │   └── diagstack-c-comment-style/
 │       ├── SKILL.md       # Agent 主规范（YAML frontmatter + 规则）
 │       └── examples.md    # Can 模块真实代码摘抄
@@ -73,14 +71,13 @@ chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
-安装目标：`~/.cursor/skills/`（包含 `c-comment-style`、`diagstack-c-comment-style`）
+安装目标：`~/.cursor/skills/diagstack-c-comment-style/`
 
 ### 方式 B：仅当前项目
 
-将 `skills/` 下所需目录复制到项目根目录，例如：
+将 `skills/diagstack-c-comment-style/` 复制到项目根目录：
 
 ```
-your-project/.cursor/skills/c-comment-style/
 your-project/.cursor/skills/diagstack-c-comment-style/
 ```
 
@@ -90,7 +87,6 @@ your-project/.cursor/skills/diagstack-c-comment-style/
 
 - 「按 DiagStack Can 注释风格给 Boot0_Download.c 加注释」
 - 「用 diagstack-c-comment-style 规范补全这个头文件」
-- 「@c-comment-style 按注释规范给 Can.c 添加函数注释」
 - 「Review 这个头文件的注释风格」
 
 Agent 会加载 Skill 并按规范生成：
@@ -106,8 +102,7 @@ Agent 会加载 Skill 并按规范生成：
 
 | Skill | 说明 |
 |-------|------|
-| [c-comment-style](skills/c-comment-style/SKILL.md) | 函数注释 .h 简写 / .c 完整（Service Name 块分工） |
-| [diagstack-c-comment-style](skills/diagstack-c-comment-style/SKILL.md) | DiagStack C/H 完整注释风格（源自 Can 模块） |
+| [diagstack-c-comment-style](skills/diagstack-c-comment-style/SKILL.md) | DiagStack C/H 注释风格（.h 简写 / .c 完整，源自 Can 模块） |
 
 ## 参考源码
 

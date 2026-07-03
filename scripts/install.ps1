@@ -1,30 +1,22 @@
-# Install all Cursor skills from this repo to user global skills folder.
+# Install DiagStack Cursor skills to user global skills folder.
 param(
     [string]$TargetRoot = "$env:USERPROFILE\.cursor\skills"
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path $PSScriptRoot -Parent
-$SkillsSrc = Join-Path $RepoRoot "skills"
+$SkillSrc = Join-Path $RepoRoot "skills\diagstack-c-comment-style"
+$SkillDst = Join-Path $TargetRoot "diagstack-c-comment-style"
 
-if (-not (Test-Path $SkillsSrc)) {
-    Write-Error "Skills source not found: $SkillsSrc"
+if (-not (Test-Path $SkillSrc)) {
+    Write-Error "Skill source not found: $SkillSrc"
 }
 
 New-Item -ItemType Directory -Force -Path $TargetRoot | Out-Null
-
-$installed = @()
-Get-ChildItem -Path $SkillsSrc -Directory | ForEach-Object {
-    $skillDst = Join-Path $TargetRoot $_.Name
-    if (Test-Path $skillDst) {
-        Remove-Item -Recurse -Force $skillDst
-    }
-    Copy-Item -Recurse -Force $_.FullName $skillDst
-    $installed += $_.Name
+if (Test-Path $SkillDst) {
+    Remove-Item -Recurse -Force $SkillDst
 }
+Copy-Item -Recurse -Force $SkillSrc $SkillDst
 
-Write-Host "Installed skills to ${TargetRoot}:"
-foreach ($name in $installed) {
-    Write-Host "  - $name"
-}
-Write-Host "Restart Cursor or start a new chat to use installed skills."
+Write-Host "Installed: $SkillDst"
+Write-Host "Restart Cursor or start a new chat to use diagstack-c-comment-style."
