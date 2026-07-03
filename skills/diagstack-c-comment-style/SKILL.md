@@ -2,9 +2,10 @@
 name: diagstack-c-comment-style
 description: >-
   Write and update C/H comments in tviibe1m/src/DiagStack using the YYH DiagStack
-  style from Can/ (file banner, section blocks, Service Name blocks, step comments,
-  Doxygen field tags). Use when adding or editing DiagStack modules, documenting
-  functions, or when the user asks for Can-style or DiagStack comment style.
+  style from Can/ (file banner, section blocks, Service Name blocks with .h brief
+  and .c full, step comments, Doxygen field tags). Use when adding or editing
+  DiagStack modules, documenting functions, or when the user asks for Can-style
+  or DiagStack comment style.
 ---
 
 # DiagStack C 注释风格（Can 模块规范）
@@ -97,32 +98,52 @@ description: >-
 --------------------------------------------------------------------------------------------------*/
 ```
 
-## 5. 函数注释
+## 5. 函数注释（.h 简写 / .c 完整）
 
-### 对外 / 重要 static 函数（完整块）
+函数块注释按文件类型分工（详见 [c-comment-style](../c-comment-style/SKILL.md)）：
+
+| 位置 | 风格 | 字段 |
+|------|------|------|
+| 头文件 `.h` | 简写 | Service Name、Description、Author |
+| 源文件 `.c` | 完整 | Service Name、Description、Arguments、Return Value、Author |
+| `.c` 内 `static` | 完整 | 同上 |
+
+### 头文件 `.h`（简写，不写 Arguments / Return Value）
 
 ```c
 /*
 ---------------------------------------------------------------------------------------------------
 * Service Name: Can_Init
-* Description : CAN 驱动层主初始化入口，遍历并配置所有注册激活的 CAN 硬件控制器
-* Arguments   : pstHandle - 指向当前待配置通道静态全局配置结构体的指针
+* Description : 遍历 g_apstCanCfgTable，初始化所有已注册 CAN 硬件通道
+* Author      : YYH
+---------------------------------------------------------------------------------------------------
+*/
+void Can_Init(void);
+```
+
+### 源文件 `.c`（完整，必须写 Arguments / Return Value）
+
+```c
+/*
+---------------------------------------------------------------------------------------------------
+* Service Name: Can_Init
+* Description : 遍历 g_apstCanCfgTable，初始化所有已注册 CAN 硬件通道
+* Arguments   : None
 * Return Value: None
 * Author      : YYH
 ---------------------------------------------------------------------------------------------------
 */
+void Can_Init(void)
+{
+    /* ... */
+}
 ```
 
-- `Arguments` / `Return Value`：有则写，无则省略（如 Can_Init 仅 Description + Author）
-- 多个参数各占一行，`name - 说明`
-
-### 简短 API（一行说明）
-
-```c
-/*
- * 诊断通道 CAN NVIC 再使能（SROM Prepare 后调用，巩固 CPUIntIdx3）。
- */
-```
+- `.h` 与 `.c` 中同一函数的 Service Name、Description、Author **保持一致**
+- 无参写 `Arguments : None`；`void` 返回写 `Return Value: None`
+- 多个参数各占一行，`name - 说明`，参数名对齐缩进
+- **每个函数都要有块注释**，不能只给第一个函数加注释
+- 禁止用单行 `/* */` 或 `//` 代替 Service Name 块
 
 ## 6. 函数体内步骤注释
 
@@ -168,7 +189,8 @@ description: >-
 
 ## 9. 不要做的事
 
-- 不要用 `//` 替代上述块注释（本风格以 `/* */` 为主）
+- 不要用 `//` 或单行 `/* */` 替代 Service Name 块注释（本风格以 `/* */` 块为主）
+- 不要在 `.h` 中写 Arguments / Return Value（参数与返回值仅在 `.c` 中写）
 - 不要省略文件头与 END OF FILE
 - 分区标题不要改成纯中文（保持 Header Files 等英文）
 - 不要写与代码无关的冗长背景
