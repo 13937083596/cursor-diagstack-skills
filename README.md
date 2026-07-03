@@ -19,6 +19,35 @@ cursor-diagstack-skills/
     └── install.sh         # macOS / Linux 安装
 ```
 
+## 发布到 GitHub（维护者）
+
+本地仓库路径：`cursor-diagstack-skills/`（与 FirstBoot 工程同级目录）
+
+**前提**：已安装 [GitHub CLI](https://cli.github.com/) 并完成登录：
+
+```powershell
+gh auth login -h github.com -p https -w
+```
+
+**一键创建远程仓库并推送：**
+
+```powershell
+cd cursor-diagstack-skills
+.\scripts\publish.ps1
+```
+
+可选参数：`-RepoName`、`-Visibility private`、`-Description "..."`
+
+**手动方式：**
+
+```powershell
+cd cursor-diagstack-skills
+git branch -M main
+gh repo create cursor-diagstack-skills --public --source=. --remote=origin --push
+```
+
+创建成功后，将下方 clone 地址中的 `YOUR_USER` 替换为你的 GitHub 用户名。
+
 ## 快速安装
 
 ### 方式 A：全局安装（推荐，所有工程可用）
