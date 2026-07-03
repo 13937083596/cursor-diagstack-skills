@@ -27,7 +27,8 @@ try {
         git branch -M main
     }
 
-    if (git remote get-url origin 2>$null) {
+    $hasOrigin = [bool](git remote 2>$null | Where-Object { $_ -eq "origin" })
+    if ($hasOrigin) {
         Write-Host "Remote 'origin' already exists. Pushing..."
         git push -u origin main
     } else {
@@ -37,6 +38,9 @@ try {
             --remote=origin `
             --push `
             --description $Description
+        if ($LASTEXITCODE -ne 0) {
+            throw "gh repo create failed with exit code $LASTEXITCODE"
+        }
     }
 
     $url = gh repo view --json url -q .url

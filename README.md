@@ -46,7 +46,7 @@ git branch -M main
 gh repo create cursor-diagstack-skills --public --source=. --remote=origin --push
 ```
 
-创建成功后，将下方 clone 地址中的 `YOUR_USER` 替换为你的 GitHub 用户名。
+创建成功后，仓库地址：https://github.com/13937083596/cursor-diagstack-skills
 
 ## 快速安装
 
@@ -55,7 +55,7 @@ gh repo create cursor-diagstack-skills --public --source=. --remote=origin --pus
 **Windows (PowerShell):**
 
 ```powershell
-git clone https://github.com/YOUR_USER/cursor-diagstack-skills.git
+git clone https://github.com/13937083596/cursor-diagstack-skills.git
 cd cursor-diagstack-skills
 .\scripts\install.ps1
 ```
@@ -63,7 +63,7 @@ cd cursor-diagstack-skills
 **macOS / Linux:**
 
 ```bash
-git clone https://github.com/YOUR_USER/cursor-diagstack-skills.git
+git clone https://github.com/13937083596/cursor-diagstack-skills.git
 cd cursor-diagstack-skills
 chmod +x scripts/install.sh
 ./scripts/install.sh
