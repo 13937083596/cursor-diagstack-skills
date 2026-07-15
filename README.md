@@ -4,7 +4,7 @@ PK2C / Traveo II 诊断栈（DiagStack）相关的 [Cursor Agent Skills](https:/
 
 当前包含基于 `tviibe1m/src/DiagStack/Can/` 模块提炼的 **C/H 文件注释规范**，供 Cursor Agent 在编写或补全 DiagStack 代码时自动遵循。
 
-**函数注释分工**：头文件 `.h` 简写（Service Name + Description + Author），源文件 `.c` 完整（另加 Arguments + Return Value）。
+**函数注释分工**：头文件 `.h` 简写（Service Name + Description + Author），源文件 `.c` 完整（另加 Arguments + Return Value）。复杂 `.c` 函数体内**必须**写 `a.` / `1.` 步骤注释，不能只写 Service Name 块头。
 
 ## 仓库结构
 
@@ -95,14 +95,14 @@ Agent 会加载 Skill 并按规范生成：
 - 英文分区标题（Header Files、Static Variables …）
 - **`.h` 简写** Service Name 块（无 Arguments / Return Value）
 - **`.c` 完整** Service Name 块（含 Arguments / Return Value）
-- `a.` / `1.` 步骤注释
+- `a.` / `1.` 步骤注释（复杂函数体内**必填**）
 - `/**< */` 成员说明
 
 ## Skill 列表
 
 | Skill | 说明 |
 |-------|------|
-| [diagstack-c-comment-style](skills/diagstack-c-comment-style/SKILL.md) | DiagStack C/H 注释风格（.h 简写 / .c 完整，源自 Can 模块） |
+| [diagstack-c-comment-style](skills/diagstack-c-comment-style/SKILL.md) | DiagStack C/H 注释风格（.h 简写 / .c 完整 + 复杂函数体内步骤注释，源自 Can / Boot1 模块） |
 
 ## 参考源码
 
