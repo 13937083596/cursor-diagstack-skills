@@ -2,9 +2,14 @@
 
 PK2C / Traveo II 诊断栈（DiagStack）相关的 [Cursor Agent Skills](https://cursor.com/docs/agent/skills) 集合。
 
-当前包含基于 `tviibe1m/src/DiagStack/Can/` 模块提炼的 **C/H 文件注释规范**，供 Cursor Agent 在编写或补全 DiagStack 代码时自动遵循。
+短调用名（对话里直接说即可）：
 
-**函数注释分工**：头文件 `.h` 简写（Service Name + Description + Author），源文件 `.c` 完整（另加 Arguments + Return Value）。复杂 `.c` 函数体内**必须**写 `a.` / `1.` 步骤注释，不能只写 Service Name 块头。
+| 调用 | 款式 | 行为 |
+|------|------|------|
+| **`dsc-a`** | A款 | **只加注释**，不改可执行逻辑 |
+| **`dsc-b`** | B款 | 先按 A款加注释，再按 **MISRA C** 改码 |
+
+注释规范：`.h` 简写 Service Name；`.c` 完整（含 Arguments / Return Value）；复杂函数体内必写 `a.` / `1.` 步骤注释。
 
 ## 仓库结构
 
@@ -13,12 +18,15 @@ cursor-diagstack-skills/
 ├── README.md
 ├── LICENSE
 ├── skills/
-│   └── diagstack-c-comment-style/
-│       ├── SKILL.md       # Agent 主规范（YAML frontmatter + 规则）
-│       └── examples.md    # Can 模块真实代码摘抄
+│   ├── dsc-a/                 # A款：只注释
+│   │   ├── SKILL.md
+│   │   └── examples.md
+│   └── dsc-b/                 # B款：注释 + MISRA 改码
+│       ├── SKILL.md
+│       └── examples.md
 └── scripts/
-    ├── install.ps1        # Windows 安装到 ~/.cursor/skills/
-    └── install.sh         # macOS / Linux 安装
+    ├── install.ps1
+    └── install.sh
 ```
 
 ## 发布到 GitHub（维护者）
@@ -71,38 +79,50 @@ chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
-安装目标：`~/.cursor/skills/diagstack-c-comment-style/`
+安装目标：
+
+- `~/.cursor/skills/dsc-a/`
+- `~/.cursor/skills/dsc-b/`
 
 ### 方式 B：仅当前项目
 
-将 `skills/diagstack-c-comment-style/` 复制到项目根目录：
+将 skill 目录复制到项目：
 
 ```
-your-project/.cursor/skills/diagstack-c-comment-style/
+your-project/.cursor/skills/dsc-a/
+your-project/.cursor/skills/dsc-b/
 ```
 
 ## 使用方式
 
 在 Cursor 对话中说例如：
 
-- 「按 DiagStack Can 注释风格给 Boot0_Download.c 加注释」
-- 「用 diagstack-c-comment-style 规范补全这个头文件」
-- 「Review 这个头文件的注释风格」
+- 「用 **dsc-a** 给 Boot1_Download.c 只加注释」
+- 「**A款**：按 DiagStack 风格补注释，别改逻辑」
+- 「用 **dsc-b** 给这个函数加注释并按 MISRA 改码」
+- 「**B款**：注释 + MISRA 修一下 FinishStep」
 
-Agent 会加载 Skill 并按规范生成：
+Agent 会加载对应 Skill：
 
-- 文件头（文件名称 / 作者 / 版本 / 修订记录）
-- 英文分区标题（Header Files、Static Variables …）
-- **`.h` 简写** Service Name 块（无 Arguments / Return Value）
-- **`.c` 完整** Service Name 块（含 Arguments / Return Value）
-- `a.` / `1.` 步骤注释（复杂函数体内**必填**）
-- `/**< */` 成员说明
+**dsc-a（A款）**
+
+- 文件头 / 英文分区 / Service Name 块
+- 复杂函数体内 `a.` / `1.` 步骤注释
+- **不改**语句、控制流、返回值
+
+**dsc-b（B款）**
+
+- 先完成 A款全部注释
+- 再按 MISRA：Yoda 比较、强制大括号、`0U` 后缀、`(void)` 丢弃返回值、`default` 等改码
 
 ## Skill 列表
 
 | Skill | 说明 |
 |-------|------|
-| [diagstack-c-comment-style](skills/diagstack-c-comment-style/SKILL.md) | DiagStack C/H 注释风格（.h 简写 / .c 完整 + 复杂函数体内步骤注释，源自 Can / Boot1 模块） |
+| [dsc-a](skills/dsc-a/SKILL.md) | A款：DiagStack 只加注释 |
+| [dsc-b](skills/dsc-b/SKILL.md) | B款：注释 + MISRA C 改码 |
+
+> 旧名 `diagstack-c-comment-style` 已废弃，安装脚本会删除遗留目录。请改用 `dsc-a` / `dsc-b`。
 
 ## 参考源码
 
@@ -111,6 +131,7 @@ Agent 会加载 Skill 并按规范生成：
 - `Can.h` / `Can.c` — 驱动层实现与 API
 - `Can_Cfg.h` — 静态配置与类型
 - `Can_PBcfg.c` — Post-Build 过滤器与映射表
+- Boot 分步下载等复杂状态机函数（体内步骤注释范例）
 
 典型工程路径：`tviibe1m/src/DiagStack/Can/`
 

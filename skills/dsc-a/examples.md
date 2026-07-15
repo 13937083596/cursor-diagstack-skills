@@ -1,4 +1,6 @@
-# DiagStack 注释示例（摘自 Can 模块）
+# DiagStack 注释示例（dsc-a / dsc-b 共用）
+
+`dsc-a` 只补这类注释；`dsc-b` 在同类注释基础上再按 MISRA 改码。
 
 ## Can.h — 文件头 + 分区 + 成员 + 原型（简写）
 
