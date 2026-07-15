@@ -1,22 +1,33 @@
-# Install DiagStack Cursor skills to user global skills folder.
+# Install DiagStack Cursor skills (dsc-a, dsc-b) to user global skills folder.
 param(
     [string]$TargetRoot = "$env:USERPROFILE\.cursor\skills"
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path $PSScriptRoot -Parent
-$SkillSrc = Join-Path $RepoRoot "skills\diagstack-c-comment-style"
-$SkillDst = Join-Path $TargetRoot "diagstack-c-comment-style"
 
-if (-not (Test-Path $SkillSrc)) {
-    Write-Error "Skill source not found: $SkillSrc"
+function Install-Skill([string]$Name) {
+    $SkillSrc = Join-Path $RepoRoot "skills\$Name"
+    $SkillDst = Join-Path $TargetRoot $Name
+    if (-not (Test-Path $SkillSrc)) {
+        Write-Error "Skill source not found: $SkillSrc"
+    }
+    if (Test-Path $SkillDst) {
+        Remove-Item -Recurse -Force $SkillDst
+    }
+    Copy-Item -Recurse -Force $SkillSrc $SkillDst
+    Write-Host "Installed: $SkillDst"
 }
 
 New-Item -ItemType Directory -Force -Path $TargetRoot | Out-Null
-if (Test-Path $SkillDst) {
-    Remove-Item -Recurse -Force $SkillDst
-}
-Copy-Item -Recurse -Force $SkillSrc $SkillDst
+Install-Skill "dsc-a"
+Install-Skill "dsc-b"
 
-Write-Host "Installed: $SkillDst"
-Write-Host "Restart Cursor or start a new chat to use diagstack-c-comment-style."
+$Legacy = Join-Path $TargetRoot "diagstack-c-comment-style"
+if (Test-Path $Legacy) {
+    Remove-Item -Recurse -Force $Legacy
+    Write-Host "Removed legacy: $Legacy"
+}
+
+Write-Host "Restart Cursor or start a new chat."
+Write-Host "Call short names: dsc-a (comments only) | dsc-b (comments + MISRA)"

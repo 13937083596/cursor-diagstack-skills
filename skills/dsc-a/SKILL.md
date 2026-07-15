@@ -1,22 +1,33 @@
 ---
-name: diagstack-c-comment-style
+name: dsc-a
 description: >-
-  Write and update C/H comments in tviibe1m/src/DiagStack using the YYH DiagStack
-  style from Can/ (file banner, section blocks, Service Name blocks with .h brief
-  and .c full, step comments, Doxygen field tags). Use when adding or editing
-  DiagStack modules, documenting functions, or when the user asks for Can-style
-  or DiagStack comment style.
+  dsc-a / A款：DiagStack C/H 只加注释、不改逻辑。YYH Can 风格（文件头、分区、
+  .h 简写 / .c 完整 Service Name、复杂函数体内 a./1. 步骤注释）。用户说 dsc-a、
+  A款、只注释、DiagStack 注释风格时使用。禁止改语句、改控制流、改返回值。
 ---
 
-# DiagStack C 注释风格（Can 模块规范）
+# dsc-a（A款）— DiagStack 只加注释
+
+短调用名：**`dsc-a`**（A款 · 注释专用）
 
 参考基准：`tviibe1m/src/DiagStack/Can/`（Can.h、Can.c、Can_Cfg.h、Can_PBcfg.c）。
 
+## 工作范围（硬约束）
+
+| 允许 | 禁止 |
+|------|------|
+| 补文件头 / 分区 / Service Name 块 | 改任何可执行语句或表达式 |
+| 补函数体内 `a.`/`1.` 步骤注释 | 改分支、循环、返回值、NRC |
+| 补 `/**< */` 成员 / 宏行尾说明 | 为 MISRA 而重排或改写代码 |
+| 调整已有注释措辞使其符合本规范 | 增删参数、改类型、改 API |
+
+需要改码请改用 **`dsc-b`**（B款）。
+
 ## 何时套用
 
-- 新建或修改 `tviibe1m/src/DiagStack/**` 下 `.c` / `.h`
-- 用户要求「Can 风格」「DiagStack 注释」「YYH 注释风格」
-- 补全函数说明、配置段说明、修订记录
+- 用户说「dsc-a」「A款」「只加注释」「DiagStack 注释」
+- 补全函数说明、配置段说明、修订记录，且**不要动逻辑**
+- 新建或修改 `tviibe1m/src/DiagStack/**` 下 `.c` / `.h` 的注释
 
 ## 语言与语气
 
@@ -238,7 +249,11 @@ void Can_Init(void);
 
 **快速对照**：`.h` → Service Name + Description + Author；`.c` → Service Name + Description + Arguments + Return Value + Author
 
-## 6. 函数体内步骤注释
+## 6. 函数体内步骤注释（**必填**）
+
+Service Name 块注释只描述函数职责；**函数体内必须写步骤注释**，让读者无需逐行读代码即可理解控制流。复杂函数（多阶段状态机、分步擦写/下载、长分支、错误回滚路径）**禁止**只写块头、函数体零注释。
+
+### 格式
 
 用字母或数字序号 + 中文冒号说明：
 
@@ -249,9 +264,62 @@ void Can_Init(void);
     /* 2. 协议家族选择：配置协议模式 (经典 CAN 或是 CAN-FD 模式) */
 ```
 
-- 顶层流程：`a.` `b.` `c.` …
-- 同层子步骤：`1.` `2.` `3.` …
-- MISRA / 边界检查可单独一句注释
+- 顶层流程 / 阶段切换：`a.` `b.` `c.` …
+- 同阶段子步骤：`1.` `2.` `3.` …
+- MISRA / 边界检查 / 失败路径可单独一句注释
+- 注释写**阶段意图、守卫条件、失败后果**，不要复述函数名或逐行翻译代码
+
+### 何时必须写
+
+| 函数特征 | 要求 |
+|----------|------|
+| 多 `if`/`switch` 分支、状态机、分步 PENDING 返回 | 每个阶段/分支入口必须有 `a.` 步骤注释 |
+| 阶段内多步校验或硬件操作 | 阶段内用 `1.` `2.` 子步骤 |
+| 简单 3 行以内直线逻辑（如 getter） | 可只写一条总述或省略 |
+| 错误返回前设置 NRC / Abort | 在对应阶段注释中说明失败语义 |
+
+### 合格 / 不合格对照
+
+**不合格**（只有块头，函数体无步骤）：
+
+```c
+/*
+---------------------------------------------------------------------------------------------------
+* Service Name: Boot1_Download_FinishStep
+* Description : 0x37 分步完成：校验、擦活动区、拷贝、更新 FlagPara 元数据
+* Arguments   : pnrc - 可选负响应码输出指针
+* Return Value: BOOT1_FINISH_OK / BOOT1_FINISH_PENDING / BOOT1_FINISH_FAIL
+* Author      : YYH
+---------------------------------------------------------------------------------------------------
+*/
+Boot1_FinishResultType Boot1_Download_FinishStep(Dcm_NegativeRespType* pnrc)
+{
+    if (NULL != pnrc) { *pnrc = DCM_NRC_OK; }
+    if (s_eState != BOOT1_DL_TRANSFERRING) { ... }
+    if (s_eFinishPhase == BOOT1_FINISH_PHASE_IDLE) { ... }
+    ...
+}
+```
+
+**合格**（块头 + 体内 `a.`/`1.` 步骤，见 [examples.md](examples.md) 中 `Boot1_Download_FinishStep` 完整示例）：
+
+```c
+Boot1_FinishResultType Boot1_Download_FinishStep(Dcm_NegativeRespType* pnrc)
+{
+    /* a. 可选输出初始化：默认 NRC 为 OK */
+    ...
+    /* b. 时序守卫：仅允许在 Transferring 态进入分步完成 */
+    ...
+    /* c. IDLE 入口：长度校验、流刷盘、镜像校验，再切入擦除阶段 */
+    if (s_eFinishPhase == BOOT1_FINISH_PHASE_IDLE)
+    {
+        /* 1. 接收长度必须与约定镜像大小一致 */
+        ...
+    }
+    /* e. ERASE：按扇区擦活动 Boot2，单次返回 PENDING */
+    ...
+}
+```
 
 ## 7. 结构体 / 宏 / 成员
 
@@ -282,12 +350,21 @@ void Can_Init(void);
 
 ## 9. 不要做的事
 
+- **不要改可执行代码**（A款只注释；改码用 `dsc-b`）
 - 不要用 `//` 或单行 `/* */` 替代 Service Name 块注释（本风格以 `/* */` 块为主）
 - 不要在 `.h` 中写 Arguments / Return Value（参数与返回值仅在 `.c` 中写）
+- **禁止复杂函数只写 Service Name 块、函数体零步骤注释**（多阶段/多分支 `.c` 必须有 `a.`/`1.` 体内注释）
 - 不要省略文件头与 END OF FILE
 - 分区标题不要改成纯中文（保持 Header Files 等英文）
 - 不要写与代码无关的冗长背景
 
 ## 示例
 
-完整片段见 [examples.md](examples.md)（摘自 Can 模块）。
+完整片段见 [examples.md](examples.md)（Can 模块 + `Boot1_Download_FinishStep` 复杂分步函数）。
+
+## 与 B款关系
+
+| 调用 | Skill | 行为 |
+|------|-------|------|
+| `dsc-a` / A款 | `skills/dsc-a` | **只注释**（本文件） |
+| `dsc-b` / B款 | `skills/dsc-b` | 注释 + MISRA C 改码 |
